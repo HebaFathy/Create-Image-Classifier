@@ -9,7 +9,6 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from torchvision import datasets, transforms, models
 from collections import OrderedDict
-from get_input_args import get_input_args
 import json
 
 
