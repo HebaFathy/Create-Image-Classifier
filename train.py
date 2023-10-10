@@ -9,13 +9,6 @@ import torch.nn.functional as F
 from torch.autograd import Variable
 from torchvision import datasets, transforms, models
 from collections import OrderedDict
-from get_input_args import get_input_args
-
-in_arg = get_input_args()
-data_dir = in_arg.dir
-train_dir = data_dir + '/train'
-valid_dir = data_dir + '/valid'
-test_dir = data_dir + '/test'
 
 # Define your transforms for the training, validation, and testing sets
 data_transforms = {
@@ -50,16 +43,8 @@ dataloaders = {
 }
 
 # network model
-if in_arg.arch== 'densenet121':
-    model = models.densenet121(pretrained=True)
-elif in_arg.arch== 'vgg13':
-    model = models.vgg13(pretrained=True)
-elif in_arg.arch=='vgg19':
-    model = models.vgg19(pretrained=True)
-elif in_arg.arch=='alexnet':
-    model = models.alexnet(pretrained=True)
-else:
-    raise ValueError('Unkown network architecture', arch)
+model = models.densenet121(pretrained=True)
+
 
 # Build and train your network
 for param in model.parameters():
@@ -103,11 +88,9 @@ for epoch in range(epochs):
         optimizer.zero_grad()
         output = model.forward(imgs)
         loss = criterion(output, labels)
-        loss.backward()
-        optimizer.step()
+
         running_loss += loss.data[0]
         if steps % print_every == 0:
-            model.eval()
             accuracy = 0
             test_loss = 0
     
@@ -124,19 +107,9 @@ for epoch in range(epochs):
                 ps = torch.exp(output).data 
                 equality = (labels.data == ps.max(1)[1])
                 accuracy += equality.type_as(torch.FloatTensor()).mean()
-                
-                 
-            train_losses.append(running_loss/len(dataloaders['training']))
-            test_losses.append(test_loss/len(dataloaders['validation']))
-            print(f"Epoch {epoch+1}/{epochs}.. "
-                    f"Train loss: {running_loss/print_every:.3f}.. "
-                    f"Validation loss: {test_loss/len(dataloaders['validation']):.3f}.. "
-                    f"Validation accuracy: {accuracy/len(dataloaders['validation']):.3f}")
             running_loss = 0
-            model.train()
 
 # Do validation on the test set
-model.eval()
 accuracy = 0
 test_loss = 0
 for imgs, labels in iter(dataloaders['testing']):
