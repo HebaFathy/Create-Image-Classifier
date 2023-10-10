@@ -12,7 +12,6 @@ from collections import OrderedDict
 from get_input_args import get_input_args
 import json
 
-in_arg = get_input_args()
 
 with open(in_arg.json, 'r') as f:
     cat_to_name = json.load(f)
@@ -23,16 +22,9 @@ def load_checkpoint(checkpoint_path):
     learning_rate = state['learning_rate']
     class_to_idx = state['class_to_idx']
     
-    if state['arch']== 'densenet121':
-        model = models.densenet121(pretrained=True)
-    elif state['arch']== 'vgg13':
-        model = models.vgg13(pretrained=True)
-    elif state['arch']== 'vgg19':
-        model = models.vgg19(pretrained=True)
-    elif state['arch']== 'alexnet':
-        model = models.alexnet(pretrained=True)
-    else:
-        raise ValueError('Unkown network architecture', arch)
+    model = models.densenet121(pretrained=True)
+
+   
     c = nn.Sequential(OrderedDict([
                           ('fc1', nn.Linear(1024, state['hidden_units'])),
                           ('relu', nn.ReLU()),
@@ -73,7 +65,6 @@ def predict(image_path, model, topk):
     ''' Predict the class (or classes) of an image using a trained deep learning model.
     '''    
     # Implement the code to predict the class from an image file
-    model.eval()
     Gpu = False 
     if torch.cuda.is_available() and in_arg.gpu:
         Gpu = True
@@ -87,7 +78,6 @@ def predict(image_path, model, topk):
         imags = Variable(tensor.float().cuda(), volatile=True)
     else:       
         imags = Variable(tensor, volatile=True)
-    imags = imags.unsqueeze(0)
     output = model.forward(imags)  
     ps = torch.exp(output).data.topk(topk)
     probabilities = ps[0].cpu() if Gpu else ps[0]
