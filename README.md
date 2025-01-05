@@ -5,7 +5,7 @@ image classifier and predicted image content.
 
 The project is broken down into multiple steps:
 
-1- Loaded and preprocess the image dataset
+1- Loaded and preprocessed the image dataset
 
 2- Trained the image classifier on your dataset
 
